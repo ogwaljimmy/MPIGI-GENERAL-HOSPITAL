@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
-  const { medicines, requests, alerts, usageRecords } = useApp();
+  const { medicines, requests, alerts, usageRecords, currentUser } = useApp();
 
   const stats = {
     totalMedicines: medicines.length,
