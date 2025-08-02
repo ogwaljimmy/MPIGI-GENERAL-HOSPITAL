@@ -85,14 +85,106 @@ const sampleMedicines: Medicine[] = [
     unit_price: 250,
     location: 'Shelf A2',
     description: 'Enhanced pain relief'
+  },
+  {
+    id: '5',
+    name: 'Metformin 500mg',
+    generic_name: 'Metformin HCl',
+    category: 'Antidiabetic',
+    manufacturer: 'Cipla Uganda',
+    batch_number: 'MET2024005',
+    expiry_date: '2026-08-15',
+    quantity_in_stock: 300,
+    minimum_stock_level: 100,
+    unit_price: 200,
+    location: 'Shelf C1',
+    description: 'Type 2 diabetes management'
+  },
+  {
+    id: '6',
+    name: 'Omeprazole 20mg',
+    generic_name: 'Omeprazole',
+    category: 'Proton Pump Inhibitor',
+    manufacturer: 'Quality Chemicals',
+    batch_number: 'OME2024006',
+    expiry_date: '2025-11-30',
+    quantity_in_stock: 150,
+    minimum_stock_level: 50,
+    unit_price: 300,
+    location: 'Shelf D1',
+    description: 'Gastric acid reduction'
+  },
+  {
+    id: '7',
+    name: 'Aspirin 75mg',
+    generic_name: 'Acetylsalicylic Acid',
+    category: 'Antiplatelet',
+    manufacturer: 'GSK',
+    batch_number: 'ASP2024007',
+    expiry_date: '2025-04-20',
+    quantity_in_stock: 400,
+    minimum_stock_level: 150,
+    unit_price: 100,
+    location: 'Shelf A3',
+    description: 'Cardiovascular protection'
   }
 ];
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [medicines, setMedicines] = useState<Medicine[]>(sampleMedicines);
-  const [requests, setRequests] = useState<MedicineRequest[]>([]);
-  const [usageRecords, setUsageRecords] = useState<UsageRecord[]>([]);
+  const [requests, setRequests] = useState<MedicineRequest[]>([
+    {
+      id: '1',
+      doctor_id: '1',
+      doctor_name: 'Dr. Sarah Nakimuli',
+      department: 'Pediatrics',
+      medicine_id: '1',
+      medicine_name: 'Paracetamol 500mg',
+      quantity_requested: 50,
+      reason: 'Fever management for pediatric patients',
+      priority: 'medium',
+      status: 'pending',
+      requested_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: '2',
+      doctor_id: '2',
+      doctor_name: 'Dr. James Musoke',
+      department: 'Internal Medicine',
+      medicine_id: '2',
+      medicine_name: 'Amoxicillin 250mg',
+      quantity_requested: 30,
+      reason: 'Respiratory tract infection treatment',
+      priority: 'high',
+      status: 'approved',
+      requested_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      approved_date: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+      approved_by: 'Florence Namukasa'
+    }
+  ]);
+  const [usageRecords, setUsageRecords] = useState<UsageRecord[]>([
+    {
+      id: '1',
+      medicine_id: '1',
+      medicine_name: 'Paracetamol 500mg',
+      quantity_used: 25,
+      used_by: 'Dr. Sarah Nakimuli',
+      department: 'Pediatrics',
+      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      purpose: 'Fever management'
+    },
+    {
+      id: '2',
+      medicine_id: '5',
+      medicine_name: 'Metformin 500mg',
+      quantity_used: 60,
+      used_by: 'Dr. James Musoke',
+      department: 'Internal Medicine',
+      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      purpose: 'Diabetes management'
+    }
+  ]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
 
   // Generate alerts on mount and when data changes

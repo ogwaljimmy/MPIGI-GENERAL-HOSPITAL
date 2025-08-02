@@ -11,7 +11,15 @@ import {
   Search
 } from 'lucide-react';
 
-const Requests: React.FC = () => {
+interface RequestsProps {
+  showNewRequestModal?: boolean;
+  setShowNewRequestModal?: (show: boolean) => void;
+}
+
+const Requests: React.FC<RequestsProps> = ({ 
+  showNewRequestModal: externalShowModal, 
+  setShowNewRequestModal: externalSetShowModal 
+}) => {
   const { 
     currentUser, 
     medicines, 
@@ -22,9 +30,13 @@ const Requests: React.FC = () => {
     dispenseRequest 
   } = useApp();
   
-  const [showNewRequestModal, setShowNewRequestModal] = useState(false);
+  const [internalShowModal, setInternalShowModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Use external modal state if provided, otherwise use internal state
+  const showNewRequestModal = externalShowModal !== undefined ? externalShowModal : internalShowModal;
+  const setShowNewRequestModal = externalSetShowModal || setInternalShowModal;
   
   const [newRequest, setNewRequest] = useState({
     medicine_id: '',
@@ -37,7 +49,8 @@ const Requests: React.FC = () => {
     const matchesSearch = request.medicine_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          request.doctor_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || request.status === statusFilter;
-    const matchesUser = currentUser?.role !== 'doctor' || request.doctor_id === currentUser.id;
+    // Allow doctors to see only their requests, but pharmacists and admins can see all
+    const matchesUser = currentUser?.role === 'doctor' ? request.doctor_id === currentUser.id : true;
     return matchesSearch && matchesStatus && matchesUser;
   });
 
@@ -114,7 +127,23 @@ const Requests: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Medicine Requests</h1>
-        {currentUser?.role === 'doctor' && (
+        <div className="flex items-center space-x-4">
+          {(currentUser?.role === 'doctor' || currentUser?.role === 'admin') && (
+            <button
+              onClick={() => setShowNewRequestModal(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Request</span>
+            </button>
+          )}
+          {(currentUser?.role === 'pharmacist' || currentUser?.role === 'admin') && (
+            <div className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-lg">
+              {requests.filter(r => r.status === 'pending').length} pending requests
+            </div>
+          )}
+        </div>
+      </div>
           <button
             onClick={() => setShowNewRequestModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
@@ -218,13 +247,13 @@ const Requests: React.FC = () => {
                           <>
                             <button
                               onClick={() => approveRequest(request.id)}
-                              className="text-green-600 hover:text-green-800 text-sm font-medium"
+                              className="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-md text-sm font-medium transition-colors"
                             >
                               Approve
                             </button>
                             <button
                               onClick={() => rejectRequest(request.id, 'Rejected by pharmacist')}
-                              className="text-red-600 hover:text-red-800 text-sm font-medium"
+                              className="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded-md text-sm font-medium transition-colors"
                             >
                               Reject
                             </button>
@@ -233,7 +262,7 @@ const Requests: React.FC = () => {
                         {request.status === 'approved' && (
                           <button
                             onClick={() => dispenseRequest(request.id)}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded-md text-sm font-medium transition-colors"
                           >
                             Dispense
                           </button>

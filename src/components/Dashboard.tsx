@@ -188,15 +188,28 @@ const Dashboard: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <FileText className="w-5 h-5 text-blue-600" />
-            <span className="font-medium text-blue-900">Submit New Request</span>
-          </button>
-          <button className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-            <Pill className="w-5 h-5 text-green-600" />
-            <span className="font-medium text-green-900">Add Medicine</span>
-          </button>
-          <button className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+          {(currentUser?.role === 'doctor' || currentUser?.role === 'admin') && (
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('openNewRequest'))}
+              className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              <FileText className="w-5 h-5 text-blue-600" />
+              <span className="font-medium text-blue-900">Submit New Request</span>
+            </button>
+          )}
+          {(currentUser?.role === 'pharmacist' || currentUser?.role === 'admin') && (
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('openAddMedicine'))}
+              className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <Pill className="w-5 h-5 text-green-600" />
+              <span className="font-medium text-green-900">Add Medicine</span>
+            </button>
+          )}
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('viewAnalytics'))}
+            className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+          >
             <TrendingUp className="w-5 h-5 text-purple-600" />
             <span className="font-medium text-purple-900">View Analytics</span>
           </button>

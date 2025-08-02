@@ -10,12 +10,24 @@ import {
   X
 } from 'lucide-react';
 
-const Inventory: React.FC = () => {
+interface InventoryProps {
+  showAddModal?: boolean;
+  setShowAddModal?: (show: boolean) => void;
+}
+
+const Inventory: React.FC<InventoryProps> = ({ 
+  showAddModal: externalShowModal, 
+  setShowAddModal: externalSetShowModal 
+}) => {
   const { medicines, updateMedicine, addMedicine, currentUser } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [internalShowModal, setInternalShowModal] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<string | null>(null);
+  
+  // Use external modal state if provided, otherwise use internal state
+  const showAddModal = externalShowModal !== undefined ? externalShowModal : internalShowModal;
+  const setShowAddModal = externalSetShowModal || setInternalShowModal;
 
   const [newMedicine, setNewMedicine] = useState({
     name: '',

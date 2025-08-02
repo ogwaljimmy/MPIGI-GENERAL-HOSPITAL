@@ -35,8 +35,13 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <div className="flex items-center">
-              <Pill className="w-8 h-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">MDH Inventory</span>
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Pill className="w-6 h-6 text-white" />
+              </div>
+              <div className="ml-3">
+                <div className="text-lg font-bold text-gray-900">MDH Inventory</div>
+                <div className="text-xs text-gray-500">Drug Management System</div>
+              </div>
             </div>
             
             <nav className="hidden md:flex space-x-1">
@@ -61,29 +66,33 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="relative">
+            {/* Notification Bell */}
+            <div className="relative" title={`${highPriorityAlerts} high priority alerts`}>
               <button className="p-2 text-gray-400 hover:text-gray-600 relative">
                 <Bell className="w-5 h-5" />
                 {highPriorityAlerts > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                     {highPriorityAlerts}
                   </span>
                 )}
               </button>
             </div>
             
+            {/* User Info */}
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <User className="w-5 h-5 text-gray-400" />
+              <div className="flex items-center space-x-3">
+                <div className="bg-gray-100 p-2 rounded-full">
+                  <User className="w-4 h-4 text-gray-600" />
+                </div>
                 <div className="text-sm">
                   <div className="font-medium text-gray-900">{currentUser?.name}</div>
-                  <div className="text-gray-500 capitalize">{currentUser?.role}</div>
+                  <div className="text-gray-500 capitalize text-xs">{currentUser?.role} • {currentUser?.department}</div>
                 </div>
               </div>
               
               <button
                 onClick={logout}
-                className="p-2 text-gray-400 hover:text-gray-600"
+                className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                 title="Logout"
               >
                 <LogOut className="w-5 h-5" />

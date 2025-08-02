@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Guitar as Hospital, Lock, Mail, AlertCircle } from 'lucide-react';
+import { Building2 as Hospital, Lock, Mail, AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -32,9 +32,20 @@ const Login: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div 
+      className="min-h-screen flex items-center justify-center px-4 relative"
+      style={{
+        backgroundImage: 'url(/public/hospital-building-modern-parking-lot-59693686.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 relative z-10">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <div className="bg-blue-600 p-3 rounded-full">
@@ -99,7 +110,7 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-8 border-t pt-6">
-            <p className="text-sm text-gray-600 mb-3">Demo credentials (password: password123):</p>
+            <p className="text-sm text-gray-600 mb-3 font-medium">Demo Accounts (password: password123):</p>
             <div className="space-y-2">
               {demoCredentials.map((cred, index) => (
                 <button
@@ -108,9 +119,10 @@ const Login: React.FC = () => {
                     setEmail(cred.email);
                     setPassword('password123');
                   }}
-                  className="w-full text-left text-xs text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded transition-colors"
+                  className="w-full text-left text-xs text-blue-600 hover:text-blue-800 p-3 hover:bg-blue-50 rounded-lg transition-colors border border-blue-100 hover:border-blue-200"
                 >
-                  {cred.email} - {cred.role}
+                  <div className="font-medium">{cred.role}</div>
+                  <div className="text-gray-500">{cred.email}</div>
                 </button>
               ))}
             </div>

@@ -11,6 +11,35 @@ import Analytics from './components/Analytics';
 const AppContent: React.FC = () => {
   const { currentUser } = useApp();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showNewRequestModal, setShowNewRequestModal] = useState(false);
+  const [showAddMedicineModal, setShowAddMedicineModal] = useState(false);
+
+  // Listen for custom events from dashboard quick actions
+  React.useEffect(() => {
+    const handleOpenNewRequest = () => {
+      setActiveTab('requests');
+      setTimeout(() => setShowNewRequestModal(true), 100);
+    };
+    
+    const handleOpenAddMedicine = () => {
+      setActiveTab('inventory');
+      setTimeout(() => setShowAddMedicineModal(true), 100);
+    };
+    
+    const handleViewAnalytics = () => {
+      setActiveTab('analytics');
+    };
+
+    window.addEventListener('openNewRequest', handleOpenNewRequest);
+    window.addEventListener('openAddMedicine', handleOpenAddMedicine);
+    window.addEventListener('viewAnalytics', handleViewAnalytics);
+
+    return () => {
+      window.removeEventListener('openNewRequest', handleOpenNewRequest);
+      window.removeEventListener('openAddMedicine', handleOpenAddMedicine);
+      window.removeEventListener('viewAnalytics', handleViewAnalytics);
+    };
+  }, []);
 
   if (!currentUser) {
     return <Login />;
@@ -21,9 +50,9 @@ const AppContent: React.FC = () => {
       case 'dashboard':
         return <Dashboard />;
       case 'inventory':
-        return <Inventory />;
+        return <Inventory showAddModal={showAddMedicineModal} setShowAddModal={setShowAddMedicineModal} />;
       case 'requests':
-        return <Requests />;
+        return <Requests showNewRequestModal={showNewRequestModal} setShowNewRequestModal={setShowNewRequestModal} />;
       case 'expiry':
         return <ExpiryMonitor />;
       case 'analytics':
