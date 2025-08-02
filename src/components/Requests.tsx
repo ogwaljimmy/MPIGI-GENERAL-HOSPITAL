@@ -144,15 +144,6 @@ const Requests: React.FC<RequestsProps> = ({
           )}
         </div>
       </div>
-          <button
-            onClick={() => setShowNewRequestModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Request</span>
-          </button>
-        )}
-      </div>
 
       {/* Search and Filter */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
