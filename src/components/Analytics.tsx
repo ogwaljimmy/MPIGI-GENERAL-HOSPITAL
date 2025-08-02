@@ -91,6 +91,177 @@ const Analytics: React.FC = () => {
 
   const analytics = getAnalytics();
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    
+    // Header
+    doc.setFontSize(20);
+    doc.text('Mpigi District Hospital', pageWidth / 2, 20, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text('Drug Inventory Analytics Report', pageWidth / 2, 30, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`Report Period: Last ${timeRange} days`, pageWidth / 2, 40, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, 50, { align: 'center' });
+    
+    let yPosition = 70;
+    
+    // Key Metrics
+    doc.setFontSize(14);
+    doc.text('Key Metrics', 20, yPosition);
+    yPosition += 10;
+    
+    const metricsData = [
+      ['Total Requests', analytics.totalRequests.toString()],
+      ['Medicine Usage (Units)', analytics.totalUsage.toString()],
+      ['Average Response Time', `${analytics.avgResponseTime}h`],
+      ['Cost Savings', `UGX ${analytics.costSavings.toLocaleString()}`]
+    ];
+    
+    doc.autoTable({
+      startY: yPosition,
+      head: [['Metric', 'Value']],
+      body: metricsData,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] },
+      margin: { left: 20, right: 20 }
+    });
+    
+    yPosition = (doc as any).lastAutoTable.finalY + 20;
+    
+    // Top Requested Medicines
+    if (analytics.topRequested.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Top Requested Medicines', 20, yPosition);
+      yPosition += 10;
+      
+      const topRequestedData = analytics.topRequested.slice(0, 10).map(([name, count]) => [
+        name,
+        count.toString()
+      ]);
+      
+      doc.autoTable({
+        startY: yPosition,
+        head: [['Medicine Name', 'Quantity Requested']],
+        body: topRequestedData,
+        theme: 'grid',
+        headStyles: { fillColor: [59, 130, 246] },
+        margin: { left: 20, right: 20 }
+      });
+      
+      yPosition = (doc as any).lastAutoTable.finalY + 20;
+    }
+    
+    // Department Usage
+    if (analytics.departmentUsage.length > 0) {
+      // Check if we need a new page
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.text('Usage by Department', 20, yPosition);
+      yPosition += 10;
+      
+      const departmentData = analytics.departmentUsage.map(([dept, usage]) => [
+        dept,
+        usage.toString()
+      ]);
+      
+      doc.autoTable({
+        startY: yPosition,
+        head: [['Department', 'Total Usage']],
+        body: departmentData,
+        theme: 'grid',
+        headStyles: { fillColor: [59, 130, 246] },
+        margin: { left: 20, right: 20 }
+      });
+      
+      yPosition = (doc as any).lastAutoTable.finalY + 20;
+    }
+    
+    // Request Status Distribution
+    if (yPosition > 200) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFontSize(14);
+    doc.text('Request Status Distribution', 20, yPosition);
+    yPosition += 10;
+    
+    const total = Object.values(analytics.statusCounts).reduce((a, b) => a + b, 0);
+    const statusData = Object.entries(analytics.statusCounts).map(([status, count]) => [
+      status.charAt(0).toUpperCase() + status.slice(1),
+      count.toString(),
+      `${((count / total) * 100).toFixed(1)}%`
+    ]);
+    
+    doc.autoTable({
+      startY: yPosition,
+      head: [['Status', 'Count', 'Percentage']],
+      body: statusData,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] },
+      margin: { left: 20, right: 20 }
+    });
+    
+    // Monthly Trends
+    if (analytics.monthlyData.length > 0) {
+      yPosition = (doc as any).lastAutoTable.finalY + 20;
+      
+      if (yPosition > 200) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.text('Monthly Trends', 20, yPosition);
+      yPosition += 10;
+      
+      const monthlyTrendsData = analytics.monthlyData.map((month, index) => {
+        const prevMonth = analytics.monthlyData[index - 1];
+        const trend = prevMonth 
+          ? ((month.requests - prevMonth.requests) / prevMonth.requests * 100).toFixed(1)
+          : '0';
+        
+        return [
+          month.month,
+          month.requests.toString(),
+          month.usage.toString(),
+          `${Math.abs(parseFloat(trend))}%`
+        ];
+      });
+      
+      doc.autoTable({
+        startY: yPosition,
+        head: [['Month', 'Requests', 'Usage', 'Trend']],
+        body: monthlyTrendsData,
+        theme: 'grid',
+        headStyles: { fillColor: [59, 130, 246] },
+        margin: { left: 20, right: 20 }
+      });
+    }
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount} - Mpigi District Hospital Drug Inventory System`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+    
+    // Save the PDF
+    const fileName = `MDH_Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+  };
+
   const StatCard = ({ title, value, icon: Icon, color, subtitle }: any) => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center justify-between">
@@ -148,7 +319,10 @@ const Analytics: React.FC = () => {
               <option value="365">Last year</option>
             </select>
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={exportToPDF}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Download className="w-4 h-4" />
             <span>Export</span>
           </button>
